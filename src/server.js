@@ -24,7 +24,8 @@ server.post('/token', async (req, res) => {
 		}
 	);
 
-	if (query == false)	return res.status(401).json({
+	if (query == false)
+		return res.status(401).json({
 			success: false,
 			status: 401,
 			message: 'Você não tem permissão.'
@@ -44,7 +45,7 @@ server.post('/token', async (req, res) => {
 			success: true,
 			status: 200,
 			message: 'OK',
-			data: { accessToken: newToken }
+			accessToken: newToken
 		});
 	} catch (error) {
 		const query = await sequelize.query(
