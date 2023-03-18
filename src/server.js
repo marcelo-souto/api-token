@@ -36,10 +36,15 @@ server.post('/token', async (req, res) => {
 	const token = query[0].refreshToken;
 
 	try {
-		jwt.verify(token, process.env.SECRET_KEY);
-		const newToken = jwt.sign({ userId, role }, process.env.SECRET_KEY, {
-			expiresIn: '15min'
-		});
+		jwt.verify(token, process.env.SECRET_REFRESH_TOKEN);
+
+		const newToken = jwt.sign(
+			{ userId, role },
+			process.env.SECRET_ACCESS_TOKEN,
+			{
+				expiresIn: '15min'
+			}
+		);
 
 		return res.status(200).json({
 			success: true,
