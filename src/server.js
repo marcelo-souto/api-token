@@ -65,7 +65,7 @@ server.post('/token', async (req, res) => {
 		const query = await sequelize.query(
 			'UPDATE users SET refreshToken = :userTokens WHERE userId = :userId',
 			{
-				replacements: { refreshToken: userTokens, userId: userId },
+				replacements: { userTokens: userTokens, userId: userId },
 				type: sequelize.QueryTypes.UPDATE
 			}
 		);
