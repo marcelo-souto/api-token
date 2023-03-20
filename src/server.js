@@ -16,10 +16,12 @@ server.post('/token', async (req, res) => {
 
 	if (!refreshToken) return res.status(422);
 
+	const refreshTokenQuery = '%' + refreshToken + '%';
+
 	const query = await sequelize.query(
-		'SELECT userId, role, refreshToken FROM users WHERE refreshToken = :refreshToken',
+		'SELECT userId, role, refreshToken FROM users WHERE refreshToken LIKE :refreshToken',
 		{
-			replacements: { refreshToken: refreshToken },
+			replacements: { refreshToken: refreshTokenQuery },
 			type: sequelize.QueryTypes.SELECT
 		}
 	);
@@ -33,7 +35,10 @@ server.post('/token', async (req, res) => {
 
 	const userId = query[0].userId;
 	const role = query[0].role;
-	const token = query[0].refreshToken;
+
+	let userTokens = JSON.parse(query[0].refreshToken);
+	const index = userTokens.findIndex((item) => item === refreshToken);
+	const token = userTokens[index];
 
 	try {
 		jwt.verify(token, process.env.SECRET_REFRESH_TOKEN);
@@ -42,7 +47,7 @@ server.post('/token', async (req, res) => {
 			{ userId, role },
 			process.env.SECRET_ACCESS_TOKEN,
 			{
-				expiresIn: '15min'
+				expiresIn: '1min'
 			}
 		);
 
@@ -53,10 +58,14 @@ server.post('/token', async (req, res) => {
 			accessToken: newToken
 		});
 	} catch (error) {
+		
+		userTokens.splice(index, 1);
+		userTokens = JSON.stringify(userTokens);
+
 		const query = await sequelize.query(
-			'UPDATE users SET refreshToken = null WHERE refreshToken = :refreshToken',
+			'UPDATE users SET refreshToken = :userTokens WHERE userId = :userId',
 			{
-				replacements: { refreshToken: refreshToken },
+				replacements: { refreshToken: userTokens, userId: userId },
 				type: sequelize.QueryTypes.UPDATE
 			}
 		);
