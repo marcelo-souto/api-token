@@ -6,10 +6,11 @@ import jwt from 'jsonwebtoken';
 dotenv.config();
 
 const server = express();
-const port = process.env.PORT || 3000;
+const port = process.env.PORT;
 
-server.use(express.json());
 server.use(cors());
+server.use(express.json());
+
 
 server.post('/token', async (req, res) => {
 	const { refreshToken } = req.body;
@@ -47,7 +48,7 @@ server.post('/token', async (req, res) => {
 			{ userId, role },
 			process.env.SECRET_ACCESS_TOKEN,
 			{
-				expiresIn: '15min'
+				expiresIn: '1h'
 			}
 		);
 
