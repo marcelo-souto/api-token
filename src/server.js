@@ -48,7 +48,7 @@ server.post('/token', async (req, res) => {
 			{ userId, role },
 			process.env.SECRET_ACCESS_TOKEN,
 			{
-				expiresIn: '1h'
+				expiresIn: '1min'
 			}
 		);
 
